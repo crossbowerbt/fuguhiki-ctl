@@ -1,6 +1,8 @@
 FuguHiki Control and Build Scripts
 ==================================
 
+<img src="https://raw.githubusercontent.com/crossbowerbt/fuguhiki-ctl/refs/heads/main/imgs/puffy_fugu.png" width="146">
+
 **FuguHiki** is a live and minimalistic OpenBSD distribution based on
 the excellent [FuguIta](https://fuguita.org/) of Yoshihiro Kawamata.
 It adds a few configurations and packages by default and a way to customize
@@ -17,12 +19,11 @@ The name is a pun on the original name of the distro: fuguhiki is a special
 kind of japanese knife with a very narrow blade profile and ground much
 thinner to enable it to cut extremely thin slices of Fugu (Blowfish).
 
-<center><img src="https://raw.githubusercontent.com/crossbowerbt/fuguhiki-ctl/refs/heads/main/imgs/puffy_fugu.png" width="146"></center>
-
 Usage
 -----
 
 Todo...
+
 
 
 
