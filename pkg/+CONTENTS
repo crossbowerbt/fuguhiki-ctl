@@ -1,0 +1,13 @@
+@name fuguhiki-ctl-1.0
+@version 10
+@arch amd64
++DESC
+@sha QGe2pqU3lJk3OQaFR2LJtNsXDFQJRtrOzHOJAXbcz2k=
+@size 149
+@cwd /usr/local
+@bin bin/fuguhiki-ctl
+@sha 5QvZQu/j8qUVd3Egd9MNZo6wrn064dzGBUEfVhbDtpM=
+@size 24257
+@bin bin/fuguhiki-firefox-ctl
+@sha gLMlahtF9VutPmjQhmvwnDe7ARRP2EcX44nNB1u+9UU=
+@size 7105

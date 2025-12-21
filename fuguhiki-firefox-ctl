@@ -1,0 +1,114 @@
+#!/usr/bin/make -f
+
+MOZILLA_PATH ?= "mozilla/firefox/"
+PROFILE_PATH = $(MOZILLA_PATH) "fuguita1.default/"
+EXTENSIONS_PATH = $(PROFILE_PATH) "extensions/"
+
+UMATRIX_URL ?= "https://addons.mozilla.org/firefox/downloads/file/3812704/umatrix-1.4.4.xpi"
+
+UMATRIX_PATH ?= $(EXTENSIONS_PATH) "uMatrix@raymondhill.net.xpi"
+
+INSTALL_INI = "            \n\
+[55A80931DC57D690]         \n\
+Default=fuguita1.default   \n\
+Locked=1                   \n\
+"
+
+PROFILE_INI =  "                  \n\
+[Profile1]                        \n\
+Name=default-default              \n\
+IsRelative=1                      \n\
+Path=fuguita1.default-default     \n\
+                                  \n\
+[Profile0]                        \n\
+Name=default                      \n\
+IsRelative=1                      \n\
+Path=fuguita1.default             \n\
+Default=1                         \n\
+                                  \n\
+[General]                         \n\
+StartWithLastProfile=1            \n\
+Version=2                         \n\
+                                  \n\
+[Install55A80931DC57D690]         \n\
+Default=fuguita1.default          \n\
+Locked=1                          \n\
+"
+
+RESET_PROFILE_SH = "\
+#!/bin/sh                                                                     \n\
+                                                                              \n\
+ls | egrep -v '^(.+[.](orig|sh)|extensions|user.js)$$' | xargs rm -r -f       \n\
+                                                                              \n\
+for i in *.orig; do cp $$i `basename $$i .orig`; done                         \n\
+                                                                              \n\
+echo 'Firefox profile restored to default one'                                \n\
+"
+
+USER_JS = '                                                                   \n\
+/* === FuguHiki Extra Settings === */                                         \n\
+                                                                              \n\
+/* disable some nagging message */                                            \n\
+user_pref("browser.shell.checkDefaultBrowser", false);                        \n\
+user_pref("browser.disableResetPrompt", true);                                \n\
+                                                                              \n\
+/* cleaner UI */                                                              \n\
+user_pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"customizableui-special-spring1\",\"vertical-spacer\",\"urlbar-container\",\"customizableui-special-spring2\",\"save-to-pocket-button\",\"downloads-button\",\"unified-extensions-button\",\"umatrix_raymondhill_net-browser-action\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"vertical-tabs\":[],\"PersonalToolbar\":[\"import-button\",\"personal-bookmarks\"]},\"seen\":[\"umatrix_raymondhill_net-browser-action\",\"developer-button\"],\"dirtyAreaCache\":[\"unified-extensions-area\",\"nav-bar\",\"vertical-tabs\",\"PersonalToolbar\",\"toolbar-menubar\",\"TabsToolbar\"],\"currentVersion\":21,\"newElementCount\":2}");    \n\
+                                                                              \n\
+/* disable some eyecandy */                                                   \n\
+user_pref("browser.tabs.hoverPreview.enabled", false);                        \n\
+                                                                              \n\
+/* compact UI */                                                              \n\
+user_pref("browser.uidensity", 1);                                            \n\
+user_pref("browser.compactmode.show", true);                                  \n\
+//user_pref("layout.css.devPixelsPerPx", "1.2"); /* default 1.25 */           \n\
+user_pref("ui.textScaleFactor", 95); /* default 100 */                        \n\
+                                                                              \n\
+/* change default search engine */                                            \n\
+user_pref("browser.urlbar.placeholderName", "DuckDuckGo");                    \n\
+user_pref("browser.urlbar.placeholderName.private", "DuckDuckGo");            \n\
+                                                                              \n\
+/* disable some extra telemetry */                                            \n\
+user_pref("datareporting.usage.uploadEnabled", false);                        \n\
+user_pref("signon.management.page.breach-alerts.enabled", false);             \n\
+user_pref("signon.rememberSignons", false);                                   \n\
+                                                                              \n\
+/* openbsd custom stuff since folder access is limited */                     \n\
+user_pref("browser.download.dir", "/root/Downloads");                         \n\
+user_pref("browser.download.folderList", 2);                                  \n\
+user_pref("browser.download.always_ask_before_handling_new_types", false);    \n\
+'
+
+EXTENSION_PREFERENCES_JSON = '\
+{"default-theme@mozilla.org":{"permissions":["internal:privateBrowsingAllowed","internal:svgContextPropertiesAllowed"],"origins":[]},"addons-search-detection@mozilla.com":{"permissions":["internal:privateBrowsingAllowed","internal:svgContextPropertiesAllowed"],"origins":[]},"uMatrix@raymondhill.net":{"permissions":["internal:privateBrowsingAllowed"],"origins":[]}}\
+'
+
+EXTENSION_SETTINGS_JSON = '\
+{"version":3,"url_overrides":{},"prefs":{"network.networkPredictionEnabled":{"initialValue":{"network.predictor.enabled":false,"network.prefetch-next":false,"network.http.speculative-parallel-limit":0,"network.dns.disablePrefetch":true},"precedenceList":[{"id":"uMatrix@raymondhill.net","installDate":1743709126802,"value":false,"enabled":true}]}}}\
+"
+
+# TODO: include extensions.json.orig???
+
+usage:
+	@echo "Manage the customized firefox installation for fuguhiki"
+	@echo "usage: $(MAKEFILE) [install|reset]"
+
+reset:
+	@(cd $(PROFILE_PATH); sh reset_profile.sh)
+
+firefox_dirs:
+	@mkdir -p $(PROFILE_PATH) $(EXTENSIONS_PATH)
+
+firefox_files: firefox_dirs
+	@echo $(INSTALL_INI) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(MOZILLA_PATH)/install.ini
+	@echo $(PROFILE_INI) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(MOZILLA_PATH)/profile.ini
+	@echo $(RESET_PROFILE_SH) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(PROFILE_PATH)/reset_profile.sh
+	@echo $(EXTENSION_PREFERENCES_JSON) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(PROFILE_PATH)/extension-preferences.json.orig
+	@echo $(EXTENSION_SETTINGS_JSON) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(PROFILE_PATH)/extension-settings.json.orig
+	@echo $(USER_JS) | sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//' > $(PROFILE_PATH)/user.js
+
+firefox_extensions: firefox_dirs
+	@(ftp -o $(UMATRIX_PATH) $(UMATRIX_URL) || curl $(UMATRIX_URL) > $(UMATRIX_PATH))
+
+install: firefox_files firefox_extensions
+	@echo "Firefox profile customized!"

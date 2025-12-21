@@ -1,0 +1,566 @@
+#!/usr/bin/make -f
+
+# Configuration: you can edit this
+
+MIRROR = https://de.dl.fuguita.org/LiveUSB/  # Germany
+#MIRROR = https://fr.dl.fuguita.org/LiveUSB/  # Paris, France
+#MIRROR = https://jp1.dl.fuguita.org/LiveUSB/ # Niigata, Japan
+#MIRROR = https://jp2.dl.fuguita.org/LiveUSB/ # Tokyo, Japan
+
+ARCH ?= amd64
+#ARCH ?= i386
+
+VERSION ?= 7.8
+
+PKG_PATH = https://cdn.openbsd.org/pub/OpenBSD/$(VERSION)/packages/$(ARCH)/
+
+ORIG_INSTALL_URL = https://cdn.openbsd.org/pub/OpenBSD
+NEW_INSTALL_URL = https://ftp.openbsd.org/pub/OpenBSD
+
+# add the packages you want to pre-install in your custom image:
+PKG_LIST =      "\n\
+## chats         \n\
+catgirl          \n\
+                 \n\
+## images        \n\
+feh              \n\
+scrot            \n\
+#grafx2          \n\
+                 \n\
+## audio/video   \n\
+mpg123           \n\
+#ffmpeg          \n\
+                 \n\
+## browsers      \n\
+badwolf          \n\
+#firefox         \n\
+                 \n\
+## doc readers   \n\
+mupdf            \n\
+                 \n\
+## emails        \n\
+mutt             \n\
+                 \n\
+## rss feeds     \n\
+sfeed            \n\
+                 \n\
+## text editors  \n\
+#emacs           \n\
+vim              \n\
+                 \n\
+## development   \n\
+got              \n\
+hexedit          \n\
+jq               \n\
+                 \n\
+## sysutils      \n\
+htop             \n\
+tree             \n\
+nnn              \n\
+p7zip            \n\
+quirks           \n\
+rlwrap           \n\
+rsync            \n\
+"
+
+# add the firmwares you want to pre-install in your custom image:
+FW_LIST = "\
+athn       \
+intel      \
+inteldrm   \
+iwm        \
+iwn        \
+uvideo     \
+vmm        \
+"
+
+# fuguhiki custom packages:
+FUGUHIKI_PKG_LIST =         "\
+dillo-plus-3.3.0-custom      \
+fuguhiki-scripts-1.0-custom  \
+sysinfo-1.0-custom           \
+"
+
+XDEFAULTS_DOTFILE = "                                    \n\
+XTerm*loginShell:true                                    \n\
+XTerm*background:black                                   \n\
+XTerm*foreground:lightgray                               \n\
+XTerm*locale:utf8                                        \n\
+XTerm*font:-*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*        \n\
+XTerm*scrollbar:false                                    \n\
+XTerm.vt100.scrollBar:false                              \n\
+XTerm*metaSendsEscape:true                               \n\
+XTerm*deleteIsDEL:false                                  \n\
+"
+
+PROFILE_DOTFILE = "                                      \n\
+PS1='\e[37;1m\u@\h:\w\p\e[0m '                           \n\
+export PATH=$PATH:/usr/fuguita/sbin:/usr/fuguita/bin     \n\
+"
+
+XINITRC_DOTFILE = "                                      \n\
+# Update PATH                                            \n\
+export PATH=$PATH:$HOME/bin:/usr/local/bin/              \n\
+                                                         \n\
+# Load X settings                                        \n\
+xrdb -load $HOME/.Xdefaults                              \n\
+                                                         \n\
+BG_COLOR='#005577'                                       \n\
+                                                         \n\
+# Disable audio bell                                     \n\
+xset b off                                               \n\
+xset b 0 0 0                                             \n\
+                                                         \n\
+# Set wallpaper                                          \n\
+xfuguroot -center puffy -scale 5 -bg darkgrey            \n\
+                                                         \n\
+# Start WM                                               \n\
+exec fvwm                                                \n\
+#exec cwm                                                \n\
+"
+
+FVWM_DOTFILE = "                                                                  \n\
+# load default config                                                             \n\
+Read /usr/X11R6/lib/X11/fvwm/.fvwmrc                                              \n\
+                                                                                  \n\
+HilightColor black Gray                                                           \n\
+WindowFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                             \n\
+IconFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                               \n\
+MenuStyle Gray30 Gray Gray30 -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-* fvwm      \n\
+                                                                                  \n\
+# default Styles:                                                                 \n\
+Style '*'           BorderWidth 3, HandleWidth 3                                  \n\
+Style '*'           Color DimGray/Gray30                                          \n\
+                                                                                  \n\
+# Styles for various Fvwm modules:                                                \n\
+Style 'Fvwm*'       BorderWidth 0, CirculateSkipIcon, CirculateSkip               \n\
+                                                                                  \n\
+# Styles for your common terminal emulator programs:                              \n\
+DestroyDecor terms                                                                \n\
+AddToDecor terms                                                                  \n\
++ ButtonStyle 1 Pixmap mini.xterm.xpm                                             \n\
+                                                                                  \n\
+######################## Initialization Functions ############################    \n\
+DestroyFunc 'InitFunction'                                                        \n\
+AddToFunc 'InitFunction' 'I' Module FvwmButtons                                   \n\
++		'I' Next [!iconic CurrentScreen xterm] Focus                      \n\
+                                                                                  \n\
+DestroyFunc 'RestartFunction'                                                     \n\
+AddToFunc 'RestartFunction' 'I' Module FvwmButtons                                \n\
++		'I' Next [!iconic CurrentScreen xterm] Focus                      \n\
+                                                                                  \n\
+######################## Menus ###################                                \n\
+AddToMenu BacklightMenu 'Backlight Control' Title                                 \n\
++	'Backlight 100%%'	exec xbacklight -set 100                          \n\
++	'Backlight  90%%'	exec xbacklight -set 90                           \n\
++	'Backlight  80%%'	exec xbacklight -set 80                           \n\
++	'Backlight  70%%'	exec xbacklight -set 70                           \n\
++	'Backlight  60%%'	exec xbacklight -set 60                           \n\
++	'Backlight  50%%'	exec xbacklight -set 50                           \n\
++	'Backlight  40%%'	exec xbacklight -set 40                           \n\
++	'Backlight  30%%'	exec xbacklight -set 30                           \n\
++	'Backlight  20%%'	exec xbacklight -set 20                           \n\
++	'Backlight  10%%'	exec xbacklight -set 10                           \n\
+                                                                                  \n\
+AddToMenu VolumeMenu  'Volume Control'  Title                                     \n\
++       'Volume 100%%'          exec mixerctl -q outputs.master=255               \n\
++       'Volume  90%%'          exec mixerctl -q outputs.master=230               \n\
++       'Volume  80%%'          exec mixerctl -q outputs.master=205               \n\
++       'Volume  70%%'          exec mixerctl -q outputs.master=180               \n\
++       'Volume  60%%'          exec mixerctl -q outputs.master=155               \n\
++       'Volume  50%%'          exec mixerctl -q outputs.master=130               \n\
++       'Volume  40%%'          exec mixerctl -q outputs.master=105               \n\
++       'Volume  30%%'          exec mixerctl -q outputs.master=80                \n\
++       'Volume  20%%'          exec mixerctl -q outputs.master=55                \n\
++       'Volume  10%%'          exec mixerctl -q outputs.master=20                \n\
++       'Volume   0%%'          exec mixerctl -q outputs.master=0                 \n\
+                                                                                  \n\
+DestroyMenu RootMenu                                                              \n\
+AddToMenu RootMenu	'Root Menu'	Title                                     \n\
++			'XTerm%mini.xterm.xpm%'		Exec exec xterm           \n\
++			'Firefox'			Exec exec firefox         \n\
++			'Dillo Plus'			Exec exec dillo-plus      \n\
++			'Calculator'			Exec exec xcalc           \n\
++			'Emacs'				Exec exec emacs           \n\
++			''		Nop                                       \n\
++			'Volume Control'		Popup VolumeMenu          \n\
++                       'Backlight Control'		Popup BacklightMenu       \n\
++			''		Nop                                       \n\
++			'Fvwm Modules'			Popup Module-Popup        \n\
++                       'Fvwm Window Ops'		Popup Window-Ops          \n\
++                       'Fvwm Simple Config Ops'	Popup Misc-Ops            \n\
++			''		Nop                                       \n\
++                       'Refresh Screen'		Refresh                   \n\
++                       'Recapture Screen'		Recapture                 \n\
++			'(Re)Start'			Popup Quit-Verify         \n\
++			''		Nop                                       \n\
++                       'XLock%mini.xlock.xpm%'         Exec exec xlock           \n\
++			''		Nop                                       \n\
++                       'Exit'				Module FvwmForm QuitVerify     \n\
+                                                                                  \n\
+############################################################################      \n\
+# Now some keyboard shortcuts.                                                    \n\
+                                                                                  \n\
+Key Tab A M WindowList Root c c NoDeskSort, SelectOnRelease Meta_L                \n\
+                                                                                  \n\
+# Arrow Keys                                                                      \n\
+# press arrow + super key, and scroll by 1 page                                   \n\
+Key Left	A	4	Scroll -100 0                                     \n\
+Key Right	A	4	Scroll +100 +0                                    \n\
+Key Up		A	4	Scroll +0   -100                                  \n\
+Key Down	A	4	Scroll +0   +100                                  \n\
+                                                                                  \n\
+################## FvwmButtons button-bar ################################        \n\
+DestroyModuleConfig FvwmButtons*                                                  \n\
+*FvwmButtonsGeometry 300x50-0-0                                                   \n\
+*FvwmButtonsRows 1                                                                \n\
+*FvwmButtons(Frame 0 Swallow XClock 'Exec xclock -padding 0 -fg Gray30 -bg DimGray &')    \n\
+*FvwmButtons(Frame 0 Swallow XLoad 'Exec xload -title xload -fg DimGray -bg Gray30 -update 3 -nolabel &')      \n\
+*FvwmButtons(Frame 0 Swallow(UseOld) 'FvwmPager' 'Module FvwmPager 0 0')          \n\
+                                                                                  \n\
+########################### Pager #########################################       \n\
+*FvwmPagerFont none                                                               \n\
+*FvwmPagerBack Gray30                                                             \n\
+*FvwmPagerFore Black                                                              \n\
+*FvwmPagerHilight DimGray                                                         \n\
+*FvwmPagerGeometry 128x96-1-1                                                     \n\
+"
+
+EMACS_DOTFILE = "                                                                                       \n\
+(require 'package)                                                                                      \n\
+(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t)                        \n\
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`     \n\
+;; and `package-pinned-packages`. Most users will not need or want to do this.                          \n\
+;;(add-to-list 'package-archives '(\"melpa-stable\" . \"https://stable.melpa.org/packages/\") t)        \n\
+(package-initialize)                                                                                    \n\
+                                                                                                        \n\
+;; disable backup files                                                                                 \n\
+(setq make-backup-files nil)                                                                            \n\
+                                                                                                        \n\
+;; disable splash screen                                                                                \n\
+(setq inhibit-splash-screen t)                                                                          \n\
+"
+
+# End of configuration
+
+# Advanced configuration: only for wizards :)
+
+SYSMEDIA_PART ?= $$(cat /boottmp/fstab | grep ' /sysmedia ' | cut -d ' ' -f 1)
+
+VND_OUTER = vnd3
+VND_OUTER_PART = vnd3a
+VND_OUTER_MOUNT = /sysmedia
+
+VND_INNER = vnd4
+VND_INNER_PART = vnd4a
+VND_INNER_MOUNT = /fuguita
+
+MBR_PATCH = "...\n\
+000001f0: 12 00 a6 2a a0 0a 40 04 00 00 bf fb 7f 00 55 aa"
+
+DISKLABEL_OUTER_PATCH = "...\n\
+00088200: 57 45 56 82 0c 00 00 00 53 43 53 49 20 64 69 73  WEV.....SCSI dis\n\
+00088210: 6b 00 00 00 00 00 00 00 42 6c 6f 63 6b 20 44 65  k.......Block De\n\
+00088220: 76 69 63 65 20 20 20 20 00 02 00 00 64 00 00 00  vice    ....d...\n\
+00088230: 01 00 00 00 ae 47 01 00 64 00 00 00 ff ff 7f 00  .....G..d.......\n\
+00088240: 33 e5 82 d1 89 4a 50 bb 00 00 00 00 00 00 00 00  3....JP.........\n\
+00088250: 40 04 00 00 ff ff 7f 00 00 00 00 00 00 00 00 00  @...............\n\
+00088260: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00088270: 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00088280: 00 00 00 00 57 45 56 82 16 a1 10 00 00 00 00 00  ....WEV.........\n\
+00088290: 00 00 00 00 a0 fb 7f 00 40 04 00 00 00 00 00 00  ........@.......\n\
+000882a0: 07 14 30 3f 00 00 00 00 00 00 00 00 00 00 00 00  ..0?............\n\
+000882b0: 00 00 00 00 ff ff 7f 00 00 00 00 00 00 00 00 00  ................\n\
+000882c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+000882d0: 00 04 90 51 00 00 00 00 00 00 00 00 00 00 00 00  ...Q............\n\
+000882e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+000882f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00088300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00088310: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00088320: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................"
+
+DISKLABEL_INNER_PATCH = "...\n\
+00008200: 57 45 56 82 0c 00 00 00 76 6e 64 20 64 65 76 69  WEV.....vnd devi\n\
+00008210: 63 65 00 00 00 00 00 00 66 69 63 74 69 74 69 6f  ce......fictitio\n\
+00008220: 75 73 00 00 00 00 00 00 00 02 00 00 64 00 00 00  us..........d...\n\
+00008230: 01 00 00 00 ce 38 01 00 64 00 00 00 84 30 7a 00  .....8..d....0z.\n\
+00008240: 8d f7 61 6b 67 1b e7 22 00 00 00 00 00 00 00 00  ..akg...........\n\
+00008250: 40 00 00 00 84 30 7a 00 00 00 00 00 00 00 00 00  @....0z.........\n\
+00008260: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00008270: 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00008280: 00 00 00 00 57 45 56 82 b1 e5 10 00 00 00 00 00  ....WEV.........\n\
+00008290: 00 00 00 00 40 30 7a 00 40 00 00 00 00 00 00 00  ....@0z.@.......\n\
+000082a0: 07 14 de 3c 00 00 00 00 00 00 00 00 00 00 00 00  ...<............\n\
+000082b0: 00 00 00 00 84 30 7a 00 00 00 00 00 00 00 00 00  .....0z.........\n\
+000082c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+000082d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+000082e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+000082f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00008300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00008310: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................\n\
+00008320: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................"
+
+# End of advanced configuration
+
+usage:
+	@echo "Prepare and mount FuguIta partition to modify the live system"
+	@echo "usage: $(MAKEFILE) [mount_live|umount_live]"
+
+all: unload_outer_img
+
+#
+# Mount/Umount Utilities
+#
+
+check_boot_mode:
+	@(if cat /etc/fstab | grep " $(VND_OUTER_MOUNT) " > /dev/null; then          \
+		echo "Error: you are not in boot mode 2 (copy files to RAM):"        \
+		     "please, reboot the system and select mode 2\n";                \
+		exit 1;                                                              \
+	fi)
+
+check_mounted_sysmedia:
+	@(if mount | grep $(VND_OUTER_MOUNT) > /dev/null; then                       \
+		echo "Error: $(VND_OUTER_MOUNT) partition is already mounted\n";     \
+		exit 1;                                                              \
+	fi)
+
+check_mounted_fuguita:
+	@(if mount | grep $(VND_INNER_MOUNT) > /dev/null; then                       \
+		echo "Error: $(VND_INNER_MOUNT) partition is already mounted\n";     \
+		exit 1;                                                              \
+	fi)
+
+check_not_mounted_sysmedia:
+	@mount | grep $(VND_OUTER_MOUNT) > /dev/null ||                              \
+		(echo "Error: $(VND_OUTER_MOUNT) partition not mounted\n";           \
+		exit 1;)
+
+check_not_mounted_fuguita:
+	@mount | grep $(VND_INNER_MOUNT) > /dev/null ||                              \
+		(echo "Error: $(VND_INNER_MOUNT) partition not mounted\n";           \
+		exit 1;)
+
+load_fuguita:
+	@echo "loading fuguita vnd image..."
+	@vnconfig $(VND_INNER) $(VND_OUTER_MOUNT)/fuguita-*.ffsimg
+
+mount_fuguita: check_boot_mode check_mounted_fuguita load_fuguita
+	@echo "mounting fuguita partition..."
+	@mkdir -p $(VND_INNER_MOUNT)
+	@mount /dev/$(VND_INNER_PART) $(VND_INNER_MOUNT)
+
+umount_fuguita:
+	@echo "umounting fuguita partition..."
+	@umount $(VND_INNER_MOUNT) || true
+
+unload_fuguita: umount_fuguita
+	@echo "Unloading fuguita vnd image..."
+	@vnconfig -u $(VND_INNER) || true
+
+umount_sysmedia: unload_fuguita
+	@echo "Umounting sysmedia partition..."
+	@umount $(VND_OUTER_MOUNT) || true
+
+prepare_chroot: check_not_mounted_fuguita
+	@echo "creating chroot devices (can take some seconds)..."
+	@(cd $(VND_INNER_MOUNT)/dev; ./MAKEDEV all)
+	@cp /etc/installurl /etc/resolv.conf $(VND_INNER_MOUNT)/etc/
+
+sync_data:
+	@echo "sync(ing) data (can take some seconds)..."
+	@sync
+
+#
+# Mount/Umount live
+#
+
+mount_sysmedia_live: check_boot_mode check_mounted_sysmedia
+	@echo "mounting sysmedia live partition..."
+	@mkdir -p $(VND_OUTER_MOUNT)
+	@mount "$(SYSMEDIA_PART)" $(VND_OUTER_MOUNT)
+
+mount_live: mount_sysmedia_live mount_fuguita prepare_chroot
+	@echo "The FuguIta partition is Ready! Enter it with: chroot $(VND_INNER_MOUNT)"
+
+umount_live: umount_sysmedia sync_data
+	@echo "The /fuguita partition has been unmounted"
+
+#
+# Mount/Umount Image
+#
+
+load_sysmedia_image:
+	@which vnconfig 2>/dev/null || ( \
+		echo "==================================================================="; \
+		echo "Not on a OpenBSD system:"; \
+		echo "The external image has been enlarged and patched!"; \
+		echo "Now you need to boot it or mount it to terminate the procedure,"; \
+		echo "an OpenBSD system with vnconfig is required for these last steps."; \
+		echo "==================================================================="; \
+		exit 1)
+	@vnconfig $(VND_OUTER) FuguIta*.img
+	@echo "Loaded sysmedia image on:"
+	@vnconfig -l | grep FuguIta*.img
+
+mount_sysmedia_image: load_sysmedia_image
+	@mkdir -p $(VND_OUTER_MOUNT)
+	@mount /dev/$(VND_OUTER_PART) $(VND_OUTER_MOUNT)
+	@echo "Mounted sysmedia image on:"
+	@mount | grep $(VND_OUTER_MOUNT)
+
+unload_sysmedia_image: umount_sysmedia
+	@echo "Unloading sysmedia vnd image..."
+	@vnconfig -u $(VND_OUTER) || true
+
+mount_image: mount_sysmedia_image mount_fuguita prepare_chroot
+	@echo "The FuguIta partition is Ready! Enter it with: chroot $(VND_INNER_MOUNT)"
+
+umount_image: unload_sysmedia_image sync_data
+	@echo "The /fuguita partition has been unmounted"
+
+#
+# Download image
+#
+
+download_url:
+	@echo -n "Selecting version: "
+	@echo -n $(MIRROR) > $@
+	@curl -s $(MIRROR) | grep -o '"FuguIta[^"]*.img.gz"' | grep $(ARCH) | grep $(VERSION) | tr -d '"' | tee -a $@ || rm $@
+
+download_img_gz: download_url
+	@echo -n "Downloading: "
+	@cat $?
+	@ftp -C $$(cat $?) || wget -c $$(cat $?)
+
+#
+# Patch outer image
+#
+
+check_xxd:
+	@which xxd >/dev/null 2>/dev/null || ( echo "Tool missing: please install xxd (could be inside the vim package)"; exit 1)
+
+enlarge_image:
+	@echo "Creating image file with size 4GB - 1 byte (i.e. 4294967295 bytes)"
+	@ls FuguIta*.gz >/dev/null 2>/dev/null || (echo "No FuguIta .gz image found in current folder"; exit 1)
+	@ls FuguIta*.img >/dev/null 2>/dev/null || ( dd if=/dev/zero of=`basename FuguIta*.gz .gz` seek=4294967294 bs=1 count=1 status=none; gunzip -c FuguIta*.gz | dd of=`basename FuguIta*.gz .gz` conv=notrunc status=none ) || rm FuguIta*.img
+	@ls -l FuguIta*.img
+
+mbr_patch.xxd: check_xxd enlarge_image
+	@echo $(MBR_PATCH) > $@
+	@echo "Resizing image MBR partitions"
+	@xxd -g1 -r $@ FuguIta*.img || (rm $@; exit 1)
+
+disklabel_outer_patch.xxd: check_xxd enlarge_image
+	@echo $(DISKLABEL_OUTER_PATCH) > $@
+	@echo "Resizing image Disklabel partitions"
+	@xxd -g1 -r $@ FuguIta*.img || (rm $@; exit 1)
+
+patch_outer_image: mbr_patch.xxd disklabel_outer_patch.xxd
+
+#
+# Patch inner image
+#
+
+grow_outer_fs: patch_outer_image load_sysmedia_image
+	@echo "Growing sysmedia image filesystem:"
+	@growfs -y $(VND_OUTER_PART) || true
+	@fsck -y /dev/$(VND_OUTER_PART)
+
+patch_bsd_fi.gz: mount_sysmedia_image
+	@cp $(VND_OUTER_MOUNT)/bsd-fi $@
+	@gunzip $@
+	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_fi
+	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
+	@gzip `basename $@ .gz`
+	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi
+	@echo "Patched bsd-fi to load /usr/local in RAM"
+
+patch_bsd_mp_fi.gz: mount_sysmedia_image
+	@cp $(VND_OUTER_MOUNT)/bsd-fi.mp $@
+	@gunzip $@
+	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_mp_fi
+	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
+	@gzip `basename $@ .gz`
+	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi.mp
+	@echo "Patched bsd-fi.mp to load /usr/local in RAM"
+
+resize_inner_fs: grow_outer_fs patch_bsd_fi.gz patch_bsd_mp_fi.gz
+	@echo "Resizing ffsimg file..."
+	@dd if=/dev/zero of=$$(echo $(VND_OUTER_MOUNT)/fuguita-*.ffsimg) seek=4100000001 bs=1 count=1 status=none
+	@echo "Resized ffsimg file:"
+	@ls -lh $$(echo $(VND_OUTER_MOUNT)/fuguita-*.ffsimg)
+
+disklabel_inner_patch.xxd: resize_inner_fs
+	@echo $(DISKLABEL_INNER_PATCH)
+	@echo "Resizing ffsimg Disklabel partitions"
+	@xxd -g1 -r $@ $$(echo $(VND_OUTER_MOUNT)/fuguita-*.ffsimg) || (rm $@; exit 1)
+
+grow_inner_fs: disklabel_inner_patch.xxd load_fuguita
+	@echo "Growing inner filesystem"
+	@growfs -y $(VND_INNER_PART) || true
+	@fsck -y /dev/$(VND_INNER_PART)
+
+patch_inner_image: grow_inner_fs unload_sysmedia_image sync_data
+	@echo "Inner FuguHiki patched and ready to be personalized"
+
+patch_image: patch_inner_image
+
+#
+# Packages and Image Configuration
+#
+
+install_pkgs:
+	@echo "Installing pkgs"
+	@echo "Note: may fail if the host and the chrooted systems have different kernel versions"
+	@echo $(PKG_LIST) | sed -r -e '/^#/d' -e 's/[ ]+$//' -e '/^$/d' | > $(VND_INNER_MOUNT)/pkg_list
+	@(PKG_PATH=$(PKG_PATH) chroot $(VND_INNER_MOUNT) pkg_add -l /pkg_list)
+	@rm $(VND_INNER_MOUNT)/pkg_list
+
+install_fw_pkgs:
+	@echo "Installing firmwares:"
+	@echo "Note: may fail if the host and the chrooted systems have different kernel versions"
+	@echo $(FW_LIST) | tr -s ' ' '\n' | sed -r 's/^/fw_update /' > $(VND_INNER_MOUNT)/fw_list.sh
+	@cp /var/run/dmesg.boot $(VND_INNER_MOUNT)/var/run/
+	@(chroot $(VND_INNER_MOUNT) sh /fw_list.sh)
+	@rm $(VND_INNER_MOUNT)/fw_list.sh $(VND_INNER_MOUNT)/var/run/dmesg.boot
+
+download_custom_pkgs:
+	@echo "Downloading custom fuguhiki pkgs:"
+	# TODO
+
+install_custom_pkgs: download_custom_pkgs
+	@echo "Installing custom fuguhiki pkgs:"
+	@(cp custom-pkgs/*.tgz $(VND_INNER_MOUNT)/root; chroot $(VND_INNER_MOUNT) pkg_add -Dunsigned /root/*.tgz; rm $(VND_INNER_MOUNT)/root/*.tgz)
+
+install_dotfiles:
+	@echo "Installing .Xdefaults"
+	@echo $(XDEFAULTS_DOTFILE) | sed -r 's/[ ]+$//' > $(VND_INNER_MOUNT)/root/.Xdefaults
+	@echo "Installing .profile"
+	@echo $(PROFILE_DOTFILE) | sed -r 's/[ ]+$//' > $(VND_INNER_MOUNT)/root/.profile
+	@echo "Installing .xinitrc"
+	@echo $(XINITRC_DOTFILE) | sed -r 's/[ ]+$//' > $(VND_INNER_MOUNT)/root/.xinitrc
+	@echo "Installing .fvwmrc"
+	@echo $(FVWM_DOTFILE) | sed -r 's/[ ]+$//' > $(VND_INNER_MOUNT)/root/.fvwmrc
+	@echo "Installing .emacs"
+	@echo $(EMACS_DOTFILE) | sed -r 's/[ ]+$//' > $(VND_INNER_MOUNT)/root/.emacs
+
+configure_fuguita: install_pkgs install_fw_pkgs install_custom_pkgs install_dotfiles
+	@echo "FuguIta personalized!"
+
+configure_live: mount_live configure_fuguita umount_live
+
+configure_image: mount_image configure_fuguita umount_image
+
+#
+# Cleanup
+#
+
+clean-patch:
+	rm -f *_dotfiles *_pkgs *_chroot *_img *_fs *_fi.gz *.xxd
+
+clean-local: clean-patch
+	rm -f *.img
+
+clean: clean-local
+	rm -f prerequisites download_url *.img.gz
