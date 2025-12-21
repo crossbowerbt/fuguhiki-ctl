@@ -17,11 +17,12 @@ The name is a pun on the original name of the distro: fuguhiki is a special
 kind of japanese knife with a very narrow blade profile and ground much
 thinner to enable it to cut extremely thin slices of Fugu (Blowfish).
 
-![Puffy with a fuguhiki](imgs/puffy_fugu.png "Puffy with a fuguhiki" =146x187)
+![Puffy with a fuguhiki](imgs/puffy_fugu.png "Puffy with a fuguhiki" | width=146)
 
 Usage
 -----
 
 Todo...
+
 
 
