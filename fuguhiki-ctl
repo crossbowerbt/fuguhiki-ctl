@@ -75,11 +75,12 @@ vmm        \
 "
 
 # fuguhiki custom packages:
-FUGUHIKI_PKG_LIST =         "\
-dillo-plus-3.3.0-custom      \
-fuguhiki-scripts-1.0-custom  \
-sysinfo-1.0-custom           \
+FUGUHIKI_PKG_LIST =         "\n\
+https://github.com/crossbowerbt/fuguhiki-ctl/raw/refs/heads/main/pkg/fuguhiki-ctl-1.0-custom.tgz       \n\
+https://github.com/crossbowerbt/xfuguroot/raw/refs/heads/main/pkg/xfuguroot-1.0.0-custom.tgz    \n\
 "
+#https://github.com/crossbowerbt/dillo-plus/raw/refs/heads/main/pkgs/obsd/dillo-plus-3.4.0-custom.tgz   \n\
+#sysinfo-1.0-custom (TODO)
 
 XDEFAULTS_DOTFILE = "                                    \n\
 XTerm*loginShell:true                                    \n\
@@ -513,7 +514,7 @@ patch_image: patch_inner_image
 install_pkgs:
 	@echo "Installing pkgs"
 	@echo "Note: may fail if the host and the chrooted systems have different kernel versions"
-	@echo $(PKG_LIST) | sed -r -e '/^#/d' -e 's/[ ]+$//' -e '/^$/d' | > $(VND_INNER_MOUNT)/pkg_list
+	@echo $(PKG_LIST) | sed -r -e '/^#/d' -e 's/[ ]+$//' -e '/^$/d' > $(VND_INNER_MOUNT)/pkg_list
 	@(PKG_PATH=$(PKG_PATH) chroot $(VND_INNER_MOUNT) pkg_add -l /pkg_list)
 	@rm $(VND_INNER_MOUNT)/pkg_list
 
@@ -527,7 +528,8 @@ install_fw_pkgs:
 
 download_custom_pkgs:
 	@echo "Downloading custom fuguhiki pkgs:"
-	# TODO
+	@mkdir -p custom-pkgs/
+	@(cd custom-pkgs/; echo $(FUGUHIKI_PKG_LIST) | xargs ftp)
 
 install_custom_pkgs: download_custom_pkgs
 	@echo "Installing custom fuguhiki pkgs:"
@@ -563,4 +565,4 @@ clean-local: clean-patch
 	rm -f *.img
 
 clean: clean-local
-	rm -f prerequisites download_url *.img.gz
+	rm -f prerequisites download_url custom-pkgs *.img.gz
