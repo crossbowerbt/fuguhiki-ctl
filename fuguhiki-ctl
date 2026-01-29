@@ -301,12 +301,6 @@ DISKLABEL_INNER_PATCH = "...\n\
 
 # End of advanced configuration
 
-usage:
-	@echo "Prepare and mount FuguIta partition to modify the live system"
-	@echo "usage: $(MAKEFILE) [mount_live|umount_live]"
-
-all: unload_outer_img
-
 #
 # Makefile utils
 #
@@ -322,6 +316,32 @@ EXTRACT-SECTION = function extract-section \
 
 # clear comments and empty lines from an embedded heredoc document
 CLEAR-SECTION = egrep -v '^\#|^[ ]*$$'
+
+#
+# Help screen
+#
+
+usage:
+
+	@echo "usage: $(MAKEFILE) [mount_live|umount_live|fuguhiki-image-build|fuguhiki-live-build]"
+	@echo ""
+	@echo "Script to build, modify and configure a FuguHiki system."
+	@echo "Here are described the most common options (read the makefile for the complete list)."
+	@echo ""
+	@echo "Utilities:"
+	@echo "   mount_live              mount /sysmedia and /fuguita partitions to modify the live system"
+	@echo "   umount_live             umount /sysmedia and /fuguita partitions"
+	@echo ""
+	@echo "System build:"
+	@echo "   fuguhiki-image-build    download a FuguIta image and build a FuguHiki system on it"
+	@echo "   fuguhiki-live-build     convert the current live system to FuguHiki (no partitions enlargement)"
+
+#
+# Complete build targets
+#
+
+fuguhiki-image-build: download_img_gz patch_image patch_bsd_ramdisks configure_image
+fuguhiki-live-build: patch_bsd_ramdisks configure_live # TODO improve
 
 #
 # Mount/Umount Utilities
@@ -482,25 +502,7 @@ grow_outer_fs: patch_outer_image load_sysmedia_image
 	@growfs -y $(VND_OUTER_PART) || true
 	@fsck -y /dev/$(VND_OUTER_PART)
 
-patch_bsd_fi.gz: mount_sysmedia_image
-	@cp $(VND_OUTER_MOUNT)/bsd-fi $@
-	@gunzip $@
-	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_fi
-	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
-	@gzip `basename $@ .gz`
-	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi
-	@echo "Patched bsd-fi to load /usr/local in RAM"
-
-patch_bsd_mp_fi.gz: mount_sysmedia_image
-	@cp $(VND_OUTER_MOUNT)/bsd-fi.mp $@
-	@gunzip $@
-	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_mp_fi
-	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
-	@gzip `basename $@ .gz`
-	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi.mp
-	@echo "Patched bsd-fi.mp to load /usr/local in RAM"
-
-resize_inner_fs: grow_outer_fs patch_bsd_fi.gz patch_bsd_mp_fi.gz
+resize_inner_fs: grow_outer_fs
 	@echo "Resizing ffsimg file..."
 	@dd if=/dev/zero of=$$(echo $(VND_OUTER_MOUNT)/fuguita-*.ffsimg) seek=4100000001 bs=1 count=1 status=none
 	@echo "Resized ffsimg file:"
@@ -520,6 +522,30 @@ patch_inner_image: grow_inner_fs unload_sysmedia_image sync_data
 	@echo "Inner FuguHiki patched and ready to be personalized"
 
 patch_image: patch_inner_image
+
+#
+# Patch BSD ramdisks
+#
+
+patch_bsd_fi.gz: mount_sysmedia_image
+	@cp $(VND_OUTER_MOUNT)/bsd-fi $@
+	@gunzip $@
+	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_fi
+	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
+	@gzip `basename $@ .gz`
+	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi
+	@echo "Patched bsd-fi to load /usr/local in RAM"
+
+patch_bsd_mp_fi.gz: mount_sysmedia_image
+	@cp $(VND_OUTER_MOUNT)/bsd-fi.mp $@
+	@gunzip $@
+	@sed -i 's|                usr/libexec/auth|      usr/local usr/libexec/auth|' patch_bsd_mp_fi
+	@sed -i "s|$(ORIG_INSTALL_URL)|$(NEW_INSTALL_URL)|" patch_bsd_fi
+	@gzip `basename $@ .gz`
+	@mv $@ $(VND_OUTER_MOUNT)/bsd-fi.mp
+	@echo "Patched bsd-fi.mp to load /usr/local in RAM"
+
+patch_bsd_ramdisks: patch_bsd_fi.gz patch_bsd_mp_fi.gz
 
 #
 # Packages and Image Configuration
