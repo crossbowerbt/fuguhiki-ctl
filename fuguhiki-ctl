@@ -18,226 +18,227 @@ ORIG_INSTALL_URL = https://cdn.openbsd.org/pub/OpenBSD
 NEW_INSTALL_URL = https://ftp.openbsd.org/pub/OpenBSD
 
 # add the packages you want to pre-install in your custom image:
-PKG_LIST = "\
-\# chats         \n\
-catgirl          \n\
-                 \n\
-\# images        \n\
-feh              \n\
-scrot            \n\
-\#grafx2         \n\
-                 \n\
-\# audio/video   \n\
-mpg123           \n\
-\#ffmpeg         \n\
-                 \n\
-\# browsers      \n\
-badwolf          \n\
-\#firefox        \n\
-                 \n\
-\# doc readers   \n\
-mupdf            \n\
-                 \n\
-\# emails        \n\
-mutt             \n\
-                 \n\
-\# rss feeds     \n\
-sfeed            \n\
-                 \n\
-\# text editors  \n\
-\#emacs          \n\
-vim              \n\
-                 \n\
-\# development   \n\
-got              \n\
-hexedit          \n\
-jq               \n\
-                 \n\
-\# sysutils      \n\
-htop             \n\
-tree             \n\
-nnn              \n\
-p7zip            \n\
-quirks           \n\
-rlwrap           \n\
-rsync            \n\
-"
+PKG_LIST = "<<EOF  \
+## chats           \
+catgirl            \
+                   \
+## images          \
+feh                \
+scrot              \
+#grafx2            \
+                   \
+## audio/video     \
+mpg123             \
+#ffmpeg            \
+                   \
+## browsers        \
+badwolf            \
+#firefox           \
+                   \
+## doc readers     \
+mupdf              \
+                   \
+## emails          \
+mutt               \
+                   \
+## rss feeds       \
+sfeed              \
+                   \
+## text editors    \
+#emacs             \
+vim                \
+                   \
+## development     \
+got                \
+hexedit            \
+jq                 \
+                   \
+## sysutils        \
+htop               \
+tree               \
+nnn                \
+p7zip              \
+quirks             \
+rlwrap             \
+rsync              \
+EOF"
 
 # add the firmwares you want to pre-install in your custom image:
-FW_LIST = "\
-athn       \
-intel      \
-inteldrm   \
-iwm        \
-iwn        \
-uvideo     \
-vmm        \
-"
+FW_LIST = "<<EOF \
+athn             \
+intel            \
+inteldrm         \
+iwm              \
+iwn              \
+uvideo           \
+vmm              \
+EOF"
 
 # fuguhiki custom packages:
-FUGUHIKI_PKG_LIST = "\
-https://github.com/crossbowerbt/fuguhiki-ctl/raw/refs/heads/main/pkg/fuguhiki-ctl-1.0-custom.tgz       \n\
-https://github.com/crossbowerbt/xfuguroot/raw/refs/heads/main/pkg/xfuguroot-1.0.0-custom.tgz           \n\
-"
-#https://github.com/crossbowerbt/dillo-plus/raw/refs/heads/main/pkgs/obsd/dillo-plus-3.4.0-custom.tgz  \n\
-#sysinfo-1.0-custom (TODO)
+FUGUHIKI_PKG_LIST = "<<EOF                                                                            \
+https://github.com/crossbowerbt/fuguhiki-ctl/raw/refs/heads/main/pkg/fuguhiki-ctl-1.0-custom.tgz      \
+https://github.com/crossbowerbt/xfuguroot/raw/refs/heads/main/pkg/xfuguroot-1.0.0-custom.tgz          \
+# TODO:                                                                                               \
+#https://github.com/crossbowerbt/dillo-plus/raw/refs/heads/main/pkgs/obsd/dillo-plus-3.4.0-custom.tgz \
+#sysinfo-1.0-custom                                                                                   \
+EOF"
 
-XDEFAULTS_DOTFILE = "\
-XTerm*loginShell:true                                    \n\
-XTerm*background:black                                   \n\
-XTerm*foreground:lightgray                               \n\
-XTerm*locale:utf8                                        \n\
-XTerm*font:-*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*        \n\
-XTerm*scrollbar:false                                    \n\
-XTerm.vt100.scrollBar:false                              \n\
-XTerm*metaSendsEscape:true                               \n\
-XTerm*deleteIsDEL:false                                  \n\
-"
+XDEFAULTS_DOTFILE = "<<EOF                               \
+XTerm*loginShell:true                                    \
+XTerm*background:black                                   \
+XTerm*foreground:lightgray                               \
+XTerm*locale:utf8                                        \
+XTerm*font:-*-fixed-medium-*-*-*-14-*-*-*-*-*-*-*        \
+XTerm*scrollbar:false                                    \
+XTerm.vt100.scrollBar:false                              \
+XTerm*metaSendsEscape:true                               \
+XTerm*deleteIsDEL:false                                  \
+EOF"
 
-PROFILE_DOTFILE = "\
-PS1='\e[37;1m\u@\h:\w\p\e[0m '                           \n\
-export PATH=$$PATH:/usr/fuguita/sbin:/usr/fuguita/bin    \n\
-"
+PROFILE_DOTFILE = "<<EOF                                 \
+PS1='\e[37;1m\u@\h:\w\p\e[0m '                           \
+export PATH=$PATH:/usr/fuguita/sbin:/usr/fuguita/bin     \
+EOF"
 
-XINITRC_DOTFILE = "\
-\# Update PATH                                           \n\
-export PATH=$$PATH:$$HOME/bin:/usr/local/bin/            \n\
-                                                         \n\
-\# Load X settings                                       \n\
-xrdb -load $$HOME/.Xdefaults                             \n\
-                                                         \n\
-\# Disable audio bell                                    \n\
-xset b off                                               \n\
-xset b 0 0 0                                             \n\
-                                                         \n\
-\# Set wallpaper                                         \n\
-xfuguroot -center puffy -scale 5 -bg darkgrey            \n\
-                                                         \n\
-\# Start WM                                              \n\
-exec fvwm                                                \n\
-\#exec cwm                                               \n\
-"
+XINITRC_DOTFILE = "<<EOF                                 \
+# Update PATH                                            \
+export PATH=$PATH:$HOME/bin:/usr/local/bin/              \
+                                                         \
+# Load X settings                                        \
+xrdb -load $HOME/.Xdefaults                              \
+                                                         \
+# Disable audio bell                                     \
+xset b off                                               \
+xset b 0 0 0                                             \
+                                                         \
+# Set wallpaper                                          \
+xfuguroot -center puffy -scale 5 -bg darkgrey            \
+                                                         \
+# Start WM                                               \
+exec fvwm                                                \
+#exec cwm                                                \
+EOF"
 
-FVWM_DOTFILE = "\
-\# load default config                                                             \n\
-Read /usr/X11R6/lib/X11/fvwm/.fvwmrc                                               \n\
-                                                                                   \n\
-HilightColor black Gray                                                            \n\
-WindowFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                              \n\
-IconFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                                \n\
-MenuStyle Gray30 Gray Gray30 -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-* fvwm       \n\
-                                                                                   \n\
-\# default Styles:                                                                 \n\
-Style '*'           BorderWidth 3, HandleWidth 3                                   \n\
-Style '*'           Color DimGray/Gray30                                           \n\
-                                                                                   \n\
-\# Styles for various Fvwm modules:                                                \n\
-Style 'Fvwm*'       BorderWidth 0, CirculateSkipIcon, CirculateSkip                \n\
-                                                                                   \n\
-\# Styles for your common terminal emulator programs:                              \n\
-DestroyDecor terms                                                                 \n\
-AddToDecor terms                                                                   \n\
-+ ButtonStyle 1 Pixmap mini.xterm.xpm                                              \n\
-                                                                                   \n\
-\# ====================== Initialization Functions ===========================     \n\
-DestroyFunc 'InitFunction'                                                         \n\
-AddToFunc 'InitFunction' 'I' Module FvwmButtons                                    \n\
-+		'I' Next [!iconic CurrentScreen xterm] Focus                       \n\
-                                                                                   \n\
-DestroyFunc 'RestartFunction'                                                      \n\
-AddToFunc 'RestartFunction' 'I' Module FvwmButtons                                 \n\
-+		'I' Next [!iconic CurrentScreen xterm] Focus                       \n\
-                                                                                   \n\
-\# ================================ Menus =====================================    \n\
-AddToMenu BacklightMenu 'Backlight Control' Title                                  \n\
-+	'Backlight 100%%'	exec xbacklight -set 100                           \n\
-+	'Backlight  90%%'	exec xbacklight -set 90                            \n\
-+	'Backlight  80%%'	exec xbacklight -set 80                            \n\
-+	'Backlight  70%%'	exec xbacklight -set 70                            \n\
-+	'Backlight  60%%'	exec xbacklight -set 60                            \n\
-+	'Backlight  50%%'	exec xbacklight -set 50                            \n\
-+	'Backlight  40%%'	exec xbacklight -set 40                            \n\
-+	'Backlight  30%%'	exec xbacklight -set 30                            \n\
-+	'Backlight  20%%'	exec xbacklight -set 20                            \n\
-+	'Backlight  10%%'	exec xbacklight -set 10                            \n\
-                                                                                   \n\
-AddToMenu VolumeMenu  'Volume Control'  Title                                      \n\
-+       'Volume 100%%'          exec mixerctl -q outputs.master=255                \n\
-+       'Volume  90%%'          exec mixerctl -q outputs.master=230                \n\
-+       'Volume  80%%'          exec mixerctl -q outputs.master=205                \n\
-+       'Volume  70%%'          exec mixerctl -q outputs.master=180                \n\
-+       'Volume  60%%'          exec mixerctl -q outputs.master=155                \n\
-+       'Volume  50%%'          exec mixerctl -q outputs.master=130                \n\
-+       'Volume  40%%'          exec mixerctl -q outputs.master=105                \n\
-+       'Volume  30%%'          exec mixerctl -q outputs.master=80                 \n\
-+       'Volume  20%%'          exec mixerctl -q outputs.master=55                 \n\
-+       'Volume  10%%'          exec mixerctl -q outputs.master=20                 \n\
-+       'Volume   0%%'          exec mixerctl -q outputs.master=0                  \n\
-                                                                                   \n\
-DestroyMenu RootMenu                                                               \n\
-AddToMenu RootMenu	'Root Menu'	Title                                      \n\
-+			'XTerm%mini.xterm.xpm%'		Exec exec xterm            \n\
-+			'Firefox'			Exec exec firefox          \n\
-+			'Dillo Plus'			Exec exec dillo-plus       \n\
-+			'Calculator'			Exec exec xcalc            \n\
-+			'Emacs'				Exec exec emacs            \n\
-+			''		Nop                                        \n\
-+			'Volume Control'		Popup VolumeMenu           \n\
-+                       'Backlight Control'		Popup BacklightMenu        \n\
-+			''		Nop                                        \n\
-+			'Fvwm Modules'			Popup Module-Popup         \n\
-+                       'Fvwm Window Ops'		Popup Window-Ops           \n\
-+                       'Fvwm Simple Config Ops'	Popup Misc-Ops             \n\
-+			''		Nop                                        \n\
-+                       'Refresh Screen'		Refresh                    \n\
-+                       'Recapture Screen'		Recapture                  \n\
-+			'(Re)Start'			Popup Quit-Verify          \n\
-+			''		Nop                                        \n\
-+                       'XLock%mini.xlock.xpm%'         Exec exec xlock            \n\
-+			''		Nop                                        \n\
-+                       'Exit'				Module FvwmForm QuitVerify \n\
-                                                                                   \n\
-\# ============================================================================    \n\
-\# Now some keyboard shortcuts.                                                    \n\
-                                                                                   \n\
-Key Tab A M WindowList Root c c NoDeskSort, SelectOnRelease Meta_L                 \n\
-                                                                                   \n\
-\# Arrow Keys                                                                      \n\
-\# press arrow + super key, and scroll by 1 page                                   \n\
-Key Left	A	4	Scroll -100 0                                      \n\
-Key Right	A	4	Scroll +100 +0                                     \n\
-Key Up		A	4	Scroll +0   -100                                   \n\
-Key Down	A	4	Scroll +0   +100                                   \n\
-                                                                                   \n\
-\# ========================= FvwmButtons button-bar ===========================    \n\
-DestroyModuleConfig FvwmButtons*                                                   \n\
-*FvwmButtonsGeometry 300x50-0-0                                                    \n\
-*FvwmButtonsRows 1                                                                 \n\
-*FvwmButtons(Frame 0 Swallow XClock 'Exec xclock -padding 0 -fg Gray30 -bg DimGray &')                       \n\
-*FvwmButtons(Frame 0 Swallow XLoad 'Exec xload -title xload -fg DimGray -bg Gray30 -update 3 -nolabel &')    \n\
-*FvwmButtons(Frame 0 Swallow(UseOld) 'FvwmPager' 'Module FvwmPager 0 0')           \n\
-                                                                                   \n\
-\# ================================= Pager ====================================    \n\
-*FvwmPagerFont none                                                                \n\
-*FvwmPagerBack Gray30                                                              \n\
-*FvwmPagerFore Black                                                               \n\
-*FvwmPagerHilight DimGray                                                          \n\
-*FvwmPagerGeometry 128x96-1-1                                                      \n\
-"
+FVWM_DOTFILE = "<<EOF                                                              \
+# load default config                                                              \
+Read /usr/X11R6/lib/X11/fvwm/.fvwmrc                                               \
+                                                                                   \
+HilightColor black Gray                                                            \
+WindowFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                              \
+IconFont -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-*                                \
+MenuStyle Gray30 Gray Gray30 -adobe-times-medium-r-*-*-12-*-*-*-*-*-*-* fvwm       \
+                                                                                   \
+# default Styles:                                                                  \
+Style '*'           BorderWidth 3, HandleWidth 3                                   \
+Style '*'           Color DimGray/Gray30                                           \
+                                                                                   \
+# Styles for various Fvwm modules:                                                 \
+Style 'Fvwm*'       BorderWidth 0, CirculateSkipIcon, CirculateSkip                \
+                                                                                   \
+# Styles for your common terminal emulator programs:                               \
+DestroyDecor terms                                                                 \
+AddToDecor terms                                                                   \
++ ButtonStyle 1 Pixmap mini.xterm.xpm                                              \
+                                                                                   \
+# ====================== Initialization Functions ===========================      \
+DestroyFunc 'InitFunction'                                                         \
+AddToFunc 'InitFunction' 'I' Module FvwmButtons                                    \
++		'I' Next [!iconic CurrentScreen xterm] Focus                       \
+                                                                                   \
+DestroyFunc 'RestartFunction'                                                      \
+AddToFunc 'RestartFunction' 'I' Module FvwmButtons                                 \
++		'I' Next [!iconic CurrentScreen xterm] Focus                       \
+                                                                                   \
+# ================================ Menus =====================================     \
+AddToMenu BacklightMenu 'Backlight Control' Title                                  \
++	'Backlight 100%%'	exec xbacklight -set 100                           \
++	'Backlight  90%%'	exec xbacklight -set 90                            \
++	'Backlight  80%%'	exec xbacklight -set 80                            \
++	'Backlight  70%%'	exec xbacklight -set 70                            \
++	'Backlight  60%%'	exec xbacklight -set 60                            \
++	'Backlight  50%%'	exec xbacklight -set 50                            \
++	'Backlight  40%%'	exec xbacklight -set 40                            \
++	'Backlight  30%%'	exec xbacklight -set 30                            \
++	'Backlight  20%%'	exec xbacklight -set 20                            \
++	'Backlight  10%%'	exec xbacklight -set 10                            \
+                                                                                   \
+AddToMenu VolumeMenu  'Volume Control'  Title                                      \
++       'Volume 100%%'          exec mixerctl -q outputs.master=255                \
++       'Volume  90%%'          exec mixerctl -q outputs.master=230                \
++       'Volume  80%%'          exec mixerctl -q outputs.master=205                \
++       'Volume  70%%'          exec mixerctl -q outputs.master=180                \
++       'Volume  60%%'          exec mixerctl -q outputs.master=155                \
++       'Volume  50%%'          exec mixerctl -q outputs.master=130                \
++       'Volume  40%%'          exec mixerctl -q outputs.master=105                \
++       'Volume  30%%'          exec mixerctl -q outputs.master=80                 \
++       'Volume  20%%'          exec mixerctl -q outputs.master=55                 \
++       'Volume  10%%'          exec mixerctl -q outputs.master=20                 \
++       'Volume   0%%'          exec mixerctl -q outputs.master=0                  \
+                                                                                   \
+DestroyMenu RootMenu                                                               \
+AddToMenu RootMenu	'Root Menu'	Title                                      \
++			'XTerm%mini.xterm.xpm%'		Exec exec xterm            \
++			'Firefox'			Exec exec firefox          \
++			'Dillo Plus'			Exec exec dillo-plus       \
++			'Calculator'			Exec exec xcalc            \
++			'Emacs'				Exec exec emacs            \
++			''		Nop                                        \
++			'Volume Control'		Popup VolumeMenu           \
++                       'Backlight Control'		Popup BacklightMenu        \
++			''		Nop                                        \
++			'Fvwm Modules'			Popup Module-Popup         \
++                       'Fvwm Window Ops'		Popup Window-Ops           \
++                       'Fvwm Simple Config Ops'	Popup Misc-Ops             \
++			''		Nop                                        \
++                       'Refresh Screen'		Refresh                    \
++                       'Recapture Screen'		Recapture                  \
++			'(Re)Start'			Popup Quit-Verify          \
++			''		Nop                                        \
++                       'XLock%mini.xlock.xpm%'         Exec exec xlock            \
++			''		Nop                                        \
++                       'Exit'				Module FvwmForm QuitVerify \
+                                                                                   \
+# ============================================================================     \
+# Now some keyboard shortcuts.                                                     \
+                                                                                   \
+Key Tab A M WindowList Root c c NoDeskSort, SelectOnRelease Meta_L                 \
+                                                                                   \
+# Arrow Keys                                                                       \
+# press arrow + super key, and scroll by 1 page                                    \
+Key Left	A	4	Scroll -100 0                                      \
+Key Right	A	4	Scroll +100 +0                                     \
+Key Up		A	4	Scroll +0   -100                                   \
+Key Down	A	4	Scroll +0   +100                                   \
+                                                                                   \
+# ========================= FvwmButtons button-bar ===========================     \
+DestroyModuleConfig FvwmButtons*                                                   \
+*FvwmButtonsGeometry 300x50-0-0                                                    \
+*FvwmButtonsRows 1                                                                 \
+*FvwmButtons(Frame 0 Swallow XClock 'Exec xclock -padding 0 -fg Gray30 -bg DimGray &')                       \
+*FvwmButtons(Frame 0 Swallow XLoad 'Exec xload -title xload -fg DimGray -bg Gray30 -update 3 -nolabel &')    \
+*FvwmButtons(Frame 0 Swallow(UseOld) 'FvwmPager' 'Module FvwmPager 0 0')           \
+                                                                                   \
+# ================================= Pager ====================================     \
+*FvwmPagerFont none                                                                \
+*FvwmPagerBack Gray30                                                              \
+*FvwmPagerFore Black                                                               \
+*FvwmPagerHilight DimGray                                                          \
+*FvwmPagerGeometry 128x96-1-1                                                      \
+EOF"
 
-EMACS_DOTFILE = "\
-(require 'package)                                                                                      \n\
-(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\") t)                        \n\
-;; Comment/uncomment this line to enable MELPA Stable if desired:                                       \n\
-;;(add-to-list 'package-archives '(\"melpa-stable\" . \"https://stable.melpa.org/packages/\") t)        \n\
-(package-initialize)                                                                                    \n\
-                                                                                                        \n\
-;; disable backup files                                                                                 \n\
-(setq make-backup-files nil)                                                                            \n\
-                                                                                                        \n\
-;; disable splash screen                                                                                \n\
-(setq inhibit-splash-screen t)                                                                          \n\
-"
+EMACS_DOTFILE = "<<EOF                                                                              \
+(require 'package)                                                                                  \
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)                        \
+;; Comment/uncomment this line to enable MELPA Stable if desired:                                   \
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)        \
+(package-initialize)                                                                                \
+                                                                                                    \
+;; disable backup files                                                                             \
+(setq make-backup-files nil)                                                                        \
+                                                                                                    \
+;; disable splash screen                                                                            \
+(setq inhibit-splash-screen t)                                                                      \
+EOF"
 
 # End of configuration
 
@@ -310,12 +311,17 @@ all: unload_outer_img
 # Makefile utils
 #
 
-# convert a buffer with comments and newlines to a simple list of keywords:
-PARSE_LIST = tr -s ' ' '\n' | egrep '^[a-zA-Z0-9]'
+# function to extract an heredoc-like document from the current Makefile
+EXTRACT-SECTION = function extract-section \
+{                                          \
+	cat $(MAKEFILE)                  | \
+	sed -r -n "/^$$1[ ]*=/,/^EOF/p"  | \
+	egrep -v "$$1[ ]*=|^EOF"         | \
+	sed -r 's/ +\\$$//';               \
+}; extract-section
 
-# convert a buffer containing a shell script to a string which can be written in a file.
-# note: you need to escape special shell characters like #, ` and $
-PARSE_FILE = sed -r -e 's/^[ ]+//' -e 's/[ ]+$$//'
+# clear comments and empty lines from an embedded heredoc document
+CLEAR-SECTION = egrep -v '^\#|^[ ]*$$'
 
 #
 # Mount/Umount Utilities
@@ -522,14 +528,14 @@ patch_image: patch_inner_image
 install_pkgs:
 	@echo "Installing pkgs"
 	@echo "Note: may fail if the host and the chrooted systems have different kernel versions"
-	@echo $(PKG_LIST) | $(PARSE_LIST) > $(VND_INNER_MOUNT)/pkg_list
+	@$(EXTRACT-SECTION) PKG_LIST | $(CLEAR-SECTION) > $(VND_INNER_MOUNT)/pkg_list
 	@(PKG_PATH=$(PKG_PATH) chroot $(VND_INNER_MOUNT) pkg_add -l /pkg_list)
 	@rm $(VND_INNER_MOUNT)/pkg_list
 
 install_fw_pkgs:
 	@echo "Installing firmwares:"
 	@echo "Note: may fail if the host and the chrooted systems have different kernel versions"
-	@echo $(FW_LIST) | $(PARSE_LIST) | sed -r 's/^/fw_update /' > $(VND_INNER_MOUNT)/fw_list.sh
+	@$(EXTRACT-SECTION) FW_LIST | $(CLEAR-SECTION) | sed -r 's/^/fw_update /' > $(VND_INNER_MOUNT)/fw_list.sh
 	@cp /var/run/dmesg.boot $(VND_INNER_MOUNT)/var/run/
 	@(chroot $(VND_INNER_MOUNT) sh /fw_list.sh)
 	@rm $(VND_INNER_MOUNT)/fw_list.sh $(VND_INNER_MOUNT)/var/run/dmesg.boot
@@ -537,7 +543,7 @@ install_fw_pkgs:
 download_custom_pkgs:
 	@echo "Downloading custom fuguhiki pkgs:"
 	@mkdir -p custom-pkgs/
-	@(cd custom-pkgs/; echo $(FUGUHIKI_PKG_LIST) | xargs ftp)
+	@(cd custom-pkgs/; $(EXTRACT-SECTION) FUGUHIKI_PKG_LIST | $(CLEAR-SECTION) | xargs ftp)
 
 install_custom_pkgs: download_custom_pkgs
 	@echo "Installing custom fuguhiki pkgs:"
@@ -545,15 +551,15 @@ install_custom_pkgs: download_custom_pkgs
 
 install_dotfiles:
 	@echo "Installing .Xdefaults"
-	@echo $(XDEFAULTS_DOTFILE) | $(PARSE_FILE) > $(VND_INNER_MOUNT)/root/.Xdefaults
+	@$(EXTRACT-SECTION) XDEFAULTS_DOTFILE > $(VND_INNER_MOUNT)/root/.Xdefaults
 	@echo "Installing .profile"
-	@echo $(PROFILE_DOTFILE) | $(PARSE_FILE) > $(VND_INNER_MOUNT)/root/.profile
+	@$(EXTRACT-SECTION) PROFILE_DOTFILE > $(VND_INNER_MOUNT)/root/.profile
 	@echo "Installing .xinitrc"
-	@echo $(XINITRC_DOTFILE) | $(PARSE_FILE) > $(VND_INNER_MOUNT)/root/.xinitrc
+	@$(EXTRACT-SECTION) XINITRC_DOTFILE > $(VND_INNER_MOUNT)/root/.xinitrc
 	@echo "Installing .fvwmrc"
-	@echo $(FVWM_DOTFILE) | $(PARSE_FILE) > $(VND_INNER_MOUNT)/root/.fvwmrc
+	@$(EXTRACT-SECTION) FVWM_DOTFILE > $(VND_INNER_MOUNT)/root/.fvwmrc
 	@echo "Installing .emacs"
-	@echo $(EMACS_DOTFILE) | $(PARSE_FILE) > $(VND_INNER_MOUNT)/root/.emacs
+	@$(EXTRACT-SECTION) EMACS_DOTFILE > $(VND_INNER_MOUNT)/root/.emacs
 
 configure_fuguita: install_pkgs install_fw_pkgs install_custom_pkgs install_dotfiles
 	@echo "FuguIta personalized!"
@@ -561,6 +567,28 @@ configure_fuguita: install_pkgs install_fw_pkgs install_custom_pkgs install_dotf
 configure_live: mount_live configure_fuguita umount_live
 
 configure_image: mount_image configure_fuguita umount_image
+
+#
+# Tests
+#
+
+test-extract-sections:
+	@echo "\n=== Extracting .Xdefaults ===\n"
+	@$(EXTRACT-SECTION) XDEFAULTS_DOTFILE
+	@echo "\n=== Extracting .profile ===\n"
+	@$(EXTRACT-SECTION) PROFILE_DOTFILE
+	@echo "\n=== Extracting .xinitrc ===\n"
+	@$(EXTRACT-SECTION) XINITRC_DOTFILE
+	@echo "\n=== Extracting .fvwmrc ===\n"
+	@$(EXTRACT-SECTION) FVWM_DOTFILE
+	@echo "\n=== Extracting .emacs ===\n"
+	@$(EXTRACT-SECTION) EMACS_DOTFILE
+	@echo "\n=== Extracting Fw Pkgs ===\n"
+	@$(EXTRACT-SECTION) FW_LIST | $(CLEAR-SECTION)
+	@echo "\n=== Extracting Pkgs ===\n"
+	@$(EXTRACT-SECTION) PKG_LIST | $(CLEAR-SECTION)
+	@echo "\n=== Extracting FuguHiki Pkgs ===\n"
+	@$(EXTRACT-SECTION) FUGUHIKI_PKG_LIST | $(CLEAR-SECTION)
 
 #
 # Cleanup
