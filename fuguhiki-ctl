@@ -80,7 +80,6 @@ https://github.com/crossbowerbt/fuguhiki-ctl/raw/refs/heads/main/pkg/fuguhiki-ct
 https://github.com/crossbowerbt/xfuguroot/raw/refs/heads/main/pkg/xfuguroot-1.0.0-custom.tgz          \
 # TODO:                                                                                               \
 #https://github.com/crossbowerbt/dillo-plus/raw/refs/heads/main/pkgs/obsd/dillo-plus-3.4.0-custom.tgz \
-#sysinfo-1.0-custom                                                                                   \
 EOF"
 
 XDEFAULTS_DOTFILE = "<<EOF                               \
@@ -329,12 +328,48 @@ usage:
 	@echo "Here are described the most common options (read the makefile for the complete list)."
 	@echo ""
 	@echo "Utilities:"
+	@echo "   sysinfo                 show informations about the current system"
 	@echo "   mount_live              mount /sysmedia and /fuguita partitions to modify the live system"
 	@echo "   umount_live             umount /sysmedia and /fuguita partitions"
 	@echo ""
 	@echo "System build:"
 	@echo "   fuguhiki-image-build    download a FuguIta image and build a FuguHiki system on it"
 	@echo "   fuguhiki-live-build     convert the current live system to FuguHiki (no partitions enlargement)"
+
+#
+# Embedded sysinfo utility
+#
+
+OS = `uname -srv`
+WM = `pgrep -l 'wm$$' | cut -d " " -f2 | head -n 1`
+UPTIME = `uptime | sed -r 's/.*up /up/' | sed -r 's/,.*//'`
+#Packages="$(pkg_info | wc -l)"
+SHELL = `basename "$$SHELL"`
+CPU = `sysctl -n hw.model`
+GPU = `glxinfo -B | grep Device: | sed -r 's/.+Device: //'`
+RAM = `top | grep Memory: | sed -r 's/.*Memory: //'`
+TEMPERATURE = `sysctl hw.sensors | grep degC | grep cpu | cut -d = -f 2`
+
+BOLD = `tput bold 2> /dev/null`
+WHITE = `tput setaf 7 2> /dev/null 0 0 2>/dev/null`
+YELLOW = `tput setaf 3 2> /dev/null 0 0 2>/dev/null`
+RESET = `tput sgr0 2> /dev/null`
+
+C1 = $(RESET)$(BOLD)$(YELLOW)
+C2 = $(RESET)$(BOLD)$(WHITE)
+CE = $(RESET)
+
+sysinfo:
+	@echo
+	@echo "                $(C2) OS: $(CE)      $(OS)"
+	@echo "$(C1)       ___      $(C2) WM: $(CE)      $(WM)"
+	@echo "$(C1)     \\-   -/    $(C2) Shell: $(CE)   $(SHELL)"
+	@echo "$(C1)  \\_/       \\   $(C2) Uptime: $(CE)  $(UPTIME)"
+	@echo "$(C1)  |      @ @|   $(C2) CPU: $(CE)     $(CPU)"
+	@echo "$(C1)  / \\     o /   $(C2) GPU: $(CE)     $(GPU)"
+	@echo "$(C1)     /-___-\\    $(C2) RAM: $(CE)     $(RAM)"
+	@echo "                $(C2) Temp: $(CE)    cpu $(TEMPERATURE)"
+	@echo
 
 #
 # Complete build targets
